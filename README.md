@@ -50,6 +50,9 @@ python app.py
 ## Dataset
 Dataset source: https://www.kaggle.com/datasets/akashshingha850/mrl-eye-dataset
 
+## Notice:
+Still has plenty of bugs; planning to fix them soon. (May 31, 2026)
+
 ## Academic Notice & License
 This project was developed strictly for academic purposes as part of the Final Project for the Digital Image Processing (Pengolahan Citra Digital) course at Universitas Jenderal Soedirman. 
 

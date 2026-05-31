@@ -48,9 +48,11 @@ python app.py
 - Press the `q` key on your keyboard to close the live feed window and exit the application safely.
 
 ## Dataset
-Access dataset source in this URL: https://www.kaggle.com/datasets/akashshingha850/mrl-eye-dataset
+Dataset source: https://www.kaggle.com/datasets/akashshingha850/mrl-eye-dataset
 
-# License
+## Academic Notice & License
 This project was developed strictly for academic purposes as part of the Final Project for the Digital Image Processing (Pengolahan Citra Digital) course at Universitas Jenderal Soedirman. 
 
 Anyone is free to use, study, and modify this codebase for educational and research purposes, provided that proper academic credit/citation is given to the original authors. Commercial use of this software is highly discouraged.
+
+Licensed under the [MIT License](LICENSE)

@@ -56,6 +56,7 @@ while True:
 
         eyes = eye_cascade.detectMultiScale(roi_gray_face)
 
+        eyes_detected = False
         for(ex,ey,ew,eh) in eyes:
             cv2.rectangle(roi_color_face, (ex,ey), (ex+ew, ey+eh), (0,255,0), 2)
             roi_eye = roi_color_face[ey:ey+eh, ex:ex+ew]
@@ -91,12 +92,12 @@ while True:
         if start_sleep_time is None:
             start_sleep_time = time.time()
         else:
-            durasi_merem = time.time() - start_sleep_time
+            long_sleep = time.time() - start_sleep_time
     elif len(faces) == 0:
         start_sleep_time = None
-        durasi_merem = 0
-    
-    if long_sleep > 2.0:
+        long_sleep = 0
+
+    if long_sleep > 0.5:
         cv2.putText(frame, "ALERT!", (10,70), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0,0,255), 3)
         play_alarm()
     else:

@@ -58,6 +58,8 @@ while True:
         eyes = eye_cascade.detectMultiScale(roi_gray_face)
 
         for(ex,ey,ew,eh) in eyes:
+            if ey > h * 0.4:
+                continue
             cv2.rectangle(roi_color_face, (ex,ey), (ex+ew, ey+eh), (0,255,0), 2)
             roi_eye = roi_color_face[ey:ey+eh, ex:ex+ew]
             input_data = preprocess_image(roi_eye)
@@ -96,7 +98,7 @@ while True:
         long_sleep = 0
 
     if long_sleep > 2.0:
-        cv2.putText(frame, "ALERT!", (10,70), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0,0,255), 3)
+        cv2.putText(frame, "ALERT!", (10,110), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0,0,255), 3)
         play_alarm()
     else:
         stop_alarm()

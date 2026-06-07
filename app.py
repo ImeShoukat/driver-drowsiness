@@ -48,6 +48,7 @@ while True:
     status_text = "mata tidak terdeteksi"
     text_persentase = ""
     color = (255,255,255)
+    eyes_detected = False
 
     for(x,y,w,h) in faces:
         cv2.rectangle(frame, (x,y), (x+w, y+h), (255,0,0), 2)
@@ -56,7 +57,6 @@ while True:
 
         eyes = eye_cascade.detectMultiScale(roi_gray_face)
 
-        eyes_detected = False
         for(ex,ey,ew,eh) in eyes:
             cv2.rectangle(roi_color_face, (ex,ey), (ex+ew, ey+eh), (0,255,0), 2)
             roi_eye = roi_color_face[ey:ey+eh, ex:ex+ew]

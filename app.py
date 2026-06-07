@@ -81,8 +81,6 @@ while True:
                 start_sleep_time = None
                 long_sleep = 0
                 text_persentase = f"Awake: {persen_awake:.1f}%"
-                start_sleep_time = None
-                long_sleep = 0
             break
     
     if not eyes_detected and len(faces) > 0:
@@ -97,7 +95,7 @@ while True:
         start_sleep_time = None
         long_sleep = 0
 
-    if long_sleep > 0.5:
+    if long_sleep > 2.0:
         cv2.putText(frame, "ALERT!", (10,70), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0,0,255), 3)
         play_alarm()
     else:

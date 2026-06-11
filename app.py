@@ -48,6 +48,7 @@ while True:
     status_text = "mata tidak terdeteksi"
     text_persentase = ""
     color = (255,255,255)
+    eyes_detected = False
 
     for(x,y,w,h) in faces:
         cv2.rectangle(frame, (x,y), (x+w, y+h), (255,0,0), 2)
@@ -56,8 +57,9 @@ while True:
 
         eyes = eye_cascade.detectMultiScale(roi_gray_face)
 
-        eyes_detected = False
         for(ex,ey,ew,eh) in eyes:
+            if ey > h * 0.4:
+                continue
             cv2.rectangle(roi_color_face, (ex,ey), (ex+ew, ey+eh), (0,255,0), 2)
             roi_eye = roi_color_face[ey:ey+eh, ex:ex+ew]
             input_data = preprocess_image(roi_eye)
@@ -81,8 +83,6 @@ while True:
                 start_sleep_time = None
                 long_sleep = 0
                 text_persentase = f"Awake: {persen_awake:.1f}%"
-                start_sleep_time = None
-                long_sleep = 0
             break
     
     if not eyes_detected and len(faces) > 0:
@@ -97,8 +97,8 @@ while True:
         start_sleep_time = None
         long_sleep = 0
 
-    if long_sleep > 0.5:
-        cv2.putText(frame, "ALERT!", (10,70), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0,0,255), 3)
+    if long_sleep > 2.0:
+        cv2.putText(frame, "ALERT!", (10,110), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0,0,255), 3)
         play_alarm()
     else:
         stop_alarm()

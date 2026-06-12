@@ -20,11 +20,18 @@ model = tf.keras.models.load_model("drowsiness_model.keras")
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 eye_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
 
-def preprocess_image(file_path):
-    gray = cv2.cvtColor(file_path, cv2.COLOR_BGR2GRAY)
+def base_preprocess_image(roi_eye_img):
+    gray = cv2.cvtColor(roi_eye_img, cv2.COLOR_BGR2GRAY)
     clah_img = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
     enhanced_img = clah_img.apply(gray)
-    resized_img = cv2.resize(enhanced_img, (64, 64))
+    _, thresholded_img = cv2.threshold(enhanced_img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    return thresholded_img
+
+def preprocess_image(roi_eye_img):
+    thresholded_eye = base_preprocess_image(roi_eye_img)
+    canny_edges = cv2.Canny(thresholded_eye, 50, 150)
+    cv2.imshow("preprocessed eye", cv2.resize(canny_edges, (200, 200)))
+    resized_img = cv2.resize(canny_edges, (64, 64))
     normalized_img = resized_img / 255.0
     final_input = np.expand_dims(normalized_img, axis=(0, -1))
     return final_input
@@ -46,7 +53,8 @@ while True:
     faces = face_cascade.detectMultiScale(gray_frame, 1.3, 5)
 
     status_text = "mata tidak terdeteksi"
-    text_persentase = ""
+    text_awake = "Awake: N/A"
+    text_sleepy = "Sleepy: N/A"
     color = (255,255,255)
     eyes_detected = False
 
@@ -55,7 +63,7 @@ while True:
         roi_gray_face = gray_frame[y:y+h, x:x+w]
         roi_color_face = frame[y:y+h, x:x+w]
 
-        eyes = eye_cascade.detectMultiScale(roi_gray_face)
+        eyes = eye_cascade.detectMultiScale(roi_gray_face, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
 
         for(ex,ey,ew,eh) in eyes:
             if ey > h * 0.4:
@@ -69,10 +77,12 @@ while True:
             persen_awake = prediction * 100
             persen_sleepy = (1 - prediction) * 100
 
+            text_awake = f"Awake: {persen_awake:.1f}%"
+            text_sleepy = f"Sleepy: {persen_sleepy:.1f}%"
+
             if prediction < 0.5:
                 status_text = "Sleepy"
                 color = (0,0,255)
-                text_persentase = f"Sleepy: {persen_sleepy:.1f}%"
                 if start_sleep_time is None:
                     start_sleep_time = time.time()
                 else:
@@ -82,13 +92,13 @@ while True:
                 color = (0,255,0)
                 start_sleep_time = None
                 long_sleep = 0
-                text_persentase = f"Awake: {persen_awake:.1f}%"
             break
     
     if not eyes_detected and len(faces) > 0:
         status_text = "Sleepy (Mata Tertutup)"
         color = (0, 0, 255)
-        text_persentase = "Sleepy: 100%"
+        text_awake = "Awake: 0.0%"
+        text_sleepy = "Sleepy: 100.0%"
         if start_sleep_time is None:
             start_sleep_time = time.time()
         else:
@@ -103,9 +113,15 @@ while True:
     else:
         stop_alarm()
 
-    cv2.putText(frame, f"Status: {status_text}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 2)
-    cv2.putText(frame, text_persentase, (10, 65), cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 2)
+    frame_width = frame.shape[1]
+    cv2.putText(frame, f"Status: {status_text}", (15, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 2)
+
+    posisi_x_kanan = frame_width - 220
     
+    cv2.putText(frame, text_awake, (posisi_x_kanan, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
+    cv2.putText(frame, text_sleepy, (posisi_x_kanan, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
+
+
     cv2.imshow("Driver Drowsiness Detection", frame)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
